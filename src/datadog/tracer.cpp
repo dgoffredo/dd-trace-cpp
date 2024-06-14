@@ -103,9 +103,9 @@ nlohmann::json Tracer::config_json() const {
   return config;
 }
 
-Span Tracer::create_span() { return create_span(SpanConfig{}); }
+Span Tracer::create_span() const { return create_span(SpanConfig{}); }
 
-Span Tracer::create_span(const SpanConfig& config) {
+Span Tracer::create_span(const SpanConfig& config) const {
   auto defaults = config_manager_->span_defaults();
   auto span_data = std::make_unique<SpanData>();
   span_data->apply_config(*defaults, config, clock_);
@@ -136,12 +136,12 @@ Span Tracer::create_span(const SpanConfig& config) {
   return span;
 }
 
-Expected<Span> Tracer::extract_span(const DictReader& reader) {
+Expected<Span> Tracer::extract_span(const DictReader& reader) const {
   return extract_span(reader, SpanConfig{});
 }
 
 Expected<Span> Tracer::extract_span(const DictReader& reader,
-                                    const SpanConfig& config) {
+                                    const SpanConfig& config) const {
   assert(!extraction_styles_.empty());
 
   AuditedReader audited_reader{reader};
@@ -310,12 +310,12 @@ Expected<Span> Tracer::extract_span(const DictReader& reader,
   return span;
 }
 
-Expected<Span> Tracer::extract_or_create_span(const DictReader& reader) {
+Expected<Span> Tracer::extract_or_create_span(const DictReader& reader) const {
   return extract_or_create_span(reader, SpanConfig{});
 }
 
 Expected<Span> Tracer::extract_or_create_span(const DictReader& reader,
-                                              const SpanConfig& config) {
+                                              const SpanConfig& config) const {
   auto maybe_span = extract_span(reader, config);
   if (!maybe_span && maybe_span.error().code == Error::NO_SPAN_TO_EXTRACT) {
     return create_span(config);
